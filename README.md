@@ -1,94 +1,94 @@
-## Employee Directory Console App
+## Консольное приложение: Справочник сотрудников (Python + SQLite)
 
-Console application for managing an employee directory with multiple execution modes per assignment requirements. Implemented in Python with SQLite (stdlib only).
+Консольное приложение, реализующее 6 режимов работы согласно заданию. Реализация на Python с использованием SQLite (только стандартная библиотека).
 
-All text files are UTF-8 encoded.
+Все текстовые файлы в UTF-8.
 
-### Features
-- Create table with fields: Last Name, First Name, Middle Name (optional), Birth Date, Gender.
-- Add a single employee via CLI.
-- List unique employees by FullName + BirthDate, sorted by name, showing age.
-- Generate and batch-insert 1,000,000 random employees (+100 forced Male with last name starting with "F").
-- Execute and time a filtered query (Male and last name starts with "F").
-- Apply DB optimization (indexes) and show timing before/after.
+### Возможности
+- Создание таблицы сотрудников с полями: Фамилия, Имя, Отчество (опционально), Дата рождения, Пол.
+- Добавление одной записи через параметры командной строки.
+- Вывод всех строк с уникальным значением ФИО+Дата рождения, отсортированных по ФИО, с расчётом полного возраста (лет).
+- Генерация и пакетная вставка 1 000 000 случайных сотрудников (+100 сотрудников Male с фамилией, начинающейся на «F»).
+- Выполнение и замер времени запроса: пол — Male, Фамилия начинается с «F».
+- Оптимизация базы (индексы) и повторный замер времени до/после.
 
-### Tech Stack
+### Технологии
 - Python 3.10+
-- SQLite (`sqlite3` from Python standard library)
-- Object-oriented design: `DBManager`, `Employee`
+- SQLite (`sqlite3` из стандартной библиотеки)
+- ООП: классы `DBManager`, `Employee`
 
-### Project Structure
+### Структура проекта
 ```
 Task_2/
   main.py
   src/
     __init__.py
-    db.py        # DBManager: connection, DDL, inserts, queries, indexes
-    models.py    # Employee: age calculation, saving, batch insert
-    utils.py     # Data generators for bulk mode
+    db.py        # DBManager: подключение, DDL, вставка, выборки, индексы
+    models.py    # Employee: расчёт возраста, сохранение, пакетная вставка
+    utils.py     # Генераторы данных для режима 4
   data/
-    employees.sqlite  # created on first run
+    employees.sqlite  # создаётся при первом запуске
 ```
 
-### Setup
-- Python 3.10+ is required.
-- No external dependencies.
-- Optional (recommended): create a virtual environment.
+### Установка
+- Требуется Python 3.10+.
+- Внешние зависимости отсутствуют.
+- Рекомендуется виртуальное окружение.
 
 Windows PowerShell:
 ```
 cd "C:\Users\amiri\PycharmProjects\Task_2"
 python --version
-# If needed:
+# при необходимости:
 # py --version
 ```
 
-### Usage (CLI Modes)
-- 1) Create table:
+### Запуск (Режимы CLI)
+- 1) Создание таблицы:
 ```
 python main.py 1
 ```
 
-- 2) Insert one record:
+- 2) Вставка одной записи:
 ```
 python main.py 2 "Ivanov Petr Sergeevich" 2009-07-12 Male
 ```
 
-- 3) List unique by FullName+BirthDate, sorted; print age:
+- 3) Вывод уникальных по ФИО+ДР, отсортированных по ФИО; вывод возраста:
 ```
 python main.py 3
 ```
 
-- 4) Generate 1,000,000 records (+100 Male with last name starting 'F') and batch-insert:
+- 4) Генерация 1 000 000 записей (+100 Male с фамилией на 'F') и пакетная вставка:
 ```
 python main.py 4
 ```
-Note: This may take time and disk space.
+Примечание: операция займёт время и место на диске.
 
-- 5) Timed query: gender=Male and last_name starts with 'F':
+- 5) Замер времени запроса: пол=Male и фамилия начинается с 'F':
 ```
 python main.py 5
 ```
-Output example:
+Пример вывода:
 ```
 Query returned 12345 rows in 78.12 ms
 ```
-Use this time in the assignment report.
+Это время используйте в отчёте.
 
-- 6) Optimization (indexes) + re-run timing:
+- 6) Оптимизация (индексы) + повторный замер:
 ```
 python main.py 6
 ```
-Output example:
+Пример вывода:
 ```
 Baseline: 12345 rows in 78.12 ms
 Optimized: 12345 rows in 12.34 ms
 Improvement: 65.78 ms faster
 ```
-Include both before/after timings in the report.
+В отчёт добавьте времена до и после.
 
-### Data Model
-Table: `employees`
+### Модель данных
+Таблица: `employees`
 - `id` INTEGER PRIMARY KEY AUTOINCREMENT
 - `last_name` TEXT NOT NULL
 - `first_name` TEXT NOT NULL
@@ -96,21 +96,21 @@ Table: `employees`
 - `birth_date` DATE NOT NULL (YYYY-MM-DD)
 - `gender` TEXT NOT NULL ("Male" | "Female")
 
-Indexes:
-- `idx_employees_name (last_name, first_name, middle_name)` for sorting in mode 3.
-- `idx_employees_gender_lastname (gender, last_name)` for filtering in mode 5/6.
+Индексы:
+- `idx_employees_name (last_name, first_name, middle_name)` — для сортировки в режиме 3.
+- `idx_employees_gender_lastname (gender, last_name)` — для фильтрации в режимах 5/6.
 
-### Design Notes
-- Age is calculated as full years based on current date and `birth_date`.
-- Unique listing (mode 3) deduplicates by `(last_name, first_name, middle_name, birth_date)` using a CTE.
-- Bulk insert (mode 4) uses a transaction with `executemany` and relaxed pragmas for speed.
+### Примечания по реализации
+- Возраст считается в полных годах от текущей даты до `birth_date`.
+- Уникальность в режиме 3 достигается по `(last_name, first_name, middle_name, birth_date)` через CTE.
+- Пакетная вставка (режим 4) выполняется транзакцией с `executemany` и ослабленными PRAGMA-параметрами для ускорения.
 
-### Troubleshooting
-- Start over with an empty DB by deleting `data\employees.sqlite`.
-- If `python` is not found, use `py` instead.
-- If mode 3 fails on date parsing, ensure you are on the latest code version (dates are now parsed from ISO strings).
+### Устранение неполадок
+- Для “чистого” старта удалите файл БД `data\employees.sqlite`.
+- Если команда `python` не найдена, используйте `py`.
+- Если в режиме 3 раньше возникала ошибка преобразования даты — обновитесь до текущей версии (дата из БД парсится из ISO-строки).
 
-### License
+### Лицензия
 MIT
 
 
